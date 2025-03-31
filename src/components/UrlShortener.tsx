@@ -27,6 +27,9 @@ const UrlShortener = () => {
   const [recentUrls, setRecentUrls] = useState<ShortenedUrl[]>([]);
   const [copied, setCopied] = useState<string | null>(null);
   
+  // The domain for generating short URLs
+  const shortUrlDomain = 'https://url-shortener-phi-sepia.vercel.app';
+  
   // Load stored URLs from localStorage on component mount
   useEffect(() => {
     const storedUrls = localStorage.getItem('shortenedUrls');
@@ -77,7 +80,7 @@ const UrlShortener = () => {
     // Simulate API call
     setTimeout(() => {
       const shortCode = generateRandomString();
-      const shortUrl = `${window.location.origin}/${shortCode}`;
+      const shortUrl = `${shortUrlDomain}/${shortCode}`;
       
       const newShortenedUrl = {
         originalUrl: url,
