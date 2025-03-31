@@ -18,6 +18,7 @@ import {
 interface ShortenedUrl {
   originalUrl: string;
   shortUrl: string;
+  shortCode: string; // Add shortCode field to make lookup easier
   createdAt: Date;
 }
 
@@ -36,7 +37,22 @@ const UrlShortener = () => {
     if (storedUrls) {
       try {
         const parsedUrls = JSON.parse(storedUrls);
-        setRecentUrls(parsedUrls);
+        
+        // Update any existing URLs to include shortCode if needed
+        const updatedUrls = parsedUrls.map((item: any) => {
+          if (!item.shortCode) {
+            const shortCode = item.shortUrl.split('/').pop();
+            return { ...item, shortCode };
+          }
+          return item;
+        });
+        
+        setRecentUrls(updatedUrls);
+        
+        // Save the updated URLs back to localStorage
+        if (JSON.stringify(updatedUrls) !== storedUrls) {
+          localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
+        }
       } catch (error) {
         console.error('Error parsing stored URLs:', error);
       }
@@ -85,6 +101,7 @@ const UrlShortener = () => {
       const newShortenedUrl = {
         originalUrl: url,
         shortUrl,
+        shortCode,
         createdAt: new Date(),
       };
       
