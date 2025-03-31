@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -93,23 +92,28 @@ const UrlShortener = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      const shortCode = generateRandomString();
-      const shortUrl = `${shortUrlDomain}/${shortCode}`;
-      
-      const newShortenedUrl = {
-        originalUrl: url,
-        shortUrl,
-        shortCode,
-        createdAt: new Date(),
-      };
-      
-      setRecentUrls(prev => [newShortenedUrl, ...prev.slice(0, 4)]);
-      setUrl('');
-      setIsLoading(false);
-      toast.success('URL shortened successfully');
-    }, 800);
+    // Generate short code
+    const shortCode = generateRandomString();
+    const shortUrl = `${shortUrlDomain}/${shortCode}`;
+    
+    const newShortenedUrl = {
+      originalUrl: url,
+      shortUrl,
+      shortCode,
+      createdAt: new Date(),
+    };
+    
+    // Save to localStorage immediately
+    const storedUrls = localStorage.getItem('shortenedUrls');
+    const existingUrls = storedUrls ? JSON.parse(storedUrls) : [];
+    const updatedUrls = [newShortenedUrl, ...existingUrls.slice(0, 4)];
+    localStorage.setItem('shortenedUrls', JSON.stringify(updatedUrls));
+    
+    // Update state
+    setRecentUrls(updatedUrls);
+    setUrl('');
+    setIsLoading(false);
+    toast.success('URL shortened successfully');
   };
   
   const copyToClipboard = (text: string) => {

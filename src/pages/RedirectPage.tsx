@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -10,43 +9,27 @@ const RedirectPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In a real application, this would make an API call to fetch the original URL
-    // For now, we'll check the localStorage to find matching URLs
     const loadAndRedirect = async () => {
       try {
-        // Simulate API call with a small delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Retrieve stored URLs from localStorage
+        // Get URLs from localStorage
         const storedUrlsString = localStorage.getItem('shortenedUrls');
         const storedUrls = storedUrlsString ? JSON.parse(storedUrlsString) : [];
         
-        // For testing purposes, log what we found
-        console.log('Searching for shortCode:', shortCode);
-        console.log('Available URLs:', storedUrls);
-        
-        // Find the URL with matching shortCode
-        // We need to extract just the shortCode part from the full URL
-        const urlData = storedUrls.find((item: any) => {
-          const itemShortCode = item.shortUrl.split('/').pop();
-          return itemShortCode === shortCode;
-        });
+        // Find matching URL
+        const urlData = storedUrls.find((item: any) => 
+          item.shortCode === shortCode
+        );
         
         if (urlData) {
-          console.log('Found matching URL:', urlData);
-          // Redirect to the original URL
+          // Redirect to original URL
           window.location.href = urlData.originalUrl;
         } else {
-          console.error('No matching URL found for shortCode:', shortCode);
-          setError('The requested short link was not found.');
-          // Don't navigate away immediately, show the error first
-          setTimeout(() => {
-            navigate('/', { replace: true });
-          }, 3000);
+          throw new Error('URL not found');
         }
       } catch (error) {
         console.error('Error during redirect:', error);
-        setError('An error occurred while processing your request.');
+        setError('The requested short link was not found.');
+        // Redirect to home after 3 seconds
         setTimeout(() => {
           navigate('/', { replace: true });
         }, 3000);
